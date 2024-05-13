@@ -135,6 +135,11 @@ export default function RR(quantum, arrayProcesos) {
           actualizarProceso(arrayProcesos, proceso, proceso.programa.pid);
           continue;
         }
+        if(plan == quantum){
+          finalPriority = true;
+          finalPriorityPID.push(proceso.programa.pid);
+          finalTick = tick;
+        }
         //Sino
         //Se añade al array de estados del proceso 'En ejecucion'
         proceso.arrayEstados.push("Ejecucion");
@@ -287,9 +292,9 @@ export default function RR(quantum, arrayProcesos) {
     // }
 
     if (finalPriority) {
-      console.log("Array en el tick " + tick + ":");
-      console.log(JSON.stringify(finalPriorityPID))
-      console.log(JSON.stringify(arrayProcesos));
+      // console.log("Array en el tick " + tick + ":");
+      // console.log(JSON.stringify(finalPriorityPID))
+      // console.log(JSON.stringify(arrayProcesos));
       // Obtener el índice del objeto después del cual deseas colocar el objeto a mover
       const indiceAntesDe = arrayProcesos.findIndex(objeto => objeto.programa.llegada >= finalTick);
       // Si se encontró el índice válido, insertar el objeto a mover después de ese índice
@@ -298,9 +303,13 @@ export default function RR(quantum, arrayProcesos) {
         // Eliminar el objeto a mover del array original
         const objetosAMover = arrayProcesos.filter(objeto => finalPriorityPID.includes(objeto.programa.pid));
         arrayProcesos = arrayProcesos.filter(objeto => !finalPriorityPID.includes(objeto.programa.pid));
+        if(objetosAMover.length > 1){
+          arrayProcesos.splice(indiceAntesDe - 2, 0, ...objetosAMover);
+        }else{
+          // Insertar el objeto a mover después del índice deseado
+          arrayProcesos.splice(indiceAntesDe - 1, 0, ...objetosAMover);
+        }
 
-        // Insertar el objeto a mover después del índice deseado
-        arrayProcesos.splice(indiceAntesDe - 1, 0, ...objetosAMover);
       } else {
         console.log("si g ya se ejecutó")
         const idObjetoAMover = finalPriorityPID[0];
@@ -315,8 +324,8 @@ export default function RR(quantum, arrayProcesos) {
         arrayProcesos = arraySinObjetoAMover.concat(objetoAMover);
 
       }
-      console.log("Despues de... ");
-      console.log(JSON.stringify(arrayProcesos));
+      // console.log("Despues de... ");
+      // console.log(JSON.stringify(arrayProcesos));
 
     }
     plan++;
