@@ -74,6 +74,7 @@ export default function RR(quantum, arrayProcesos) {
         isProcesoEnEjecucion = true;
         //se revisa si el contador de ejecucion es igual a la duracion del programa dentro del proceso, para saber si ya termino el proceso.
         if (proceso.counterEjecucion === proceso.programa.duracion) {
+          plan = 3;
           //De ser asi el booleano terminado del proceso pasa a true
           proceso.terminado = true;
           //se actualizan las estadisticas del programa
@@ -154,6 +155,7 @@ export default function RR(quantum, arrayProcesos) {
         isProcesoEnEjecucion = true;
         //se revisa si el contador de ejecucion es igual a la duracion del programa dentro del proceso.
         if (proceso.counterEjecucion === proceso.programa.duracion) {
+          plan = 3;
           //De ser asi el booleano terminado del proceso pasa a true
           proceso.terminado = true;
           //se actualizan las estadisticas del programa
@@ -212,6 +214,7 @@ export default function RR(quantum, arrayProcesos) {
           isProcesoEnEjecucion = true;
           //Se revisa si el contador de ejecucion es igual a la duracion del programa dentro del proceso.
           if (proceso.counterEjecucion === proceso.programa.duracion) {
+            plan = 3;
             //De ser asi el booleano terminado del proceso pasa a true
             proceso.terminado = true;
             proceso = calcularEstadisticasProceso(proceso, tick);
@@ -259,6 +262,7 @@ export default function RR(quantum, arrayProcesos) {
         isProcesoEnEjecucion = true;
         //Se revisa si el contador de ejecucion es igual a la duracion del programa dentro del proceso.
         if (proceso.counterEjecucion === proceso.programa.duracion) {
+          plan = 3;
           //De ser asi el booleano terminado del proceso pasa a true
           proceso.terminado = true;
           proceso = calcularEstadisticasProceso(proceso, tick);
@@ -311,7 +315,7 @@ export default function RR(quantum, arrayProcesos) {
         }
 
       } else {
-        console.log("si g ya se ejecutó")
+        // console.log("si g ya se ejecutó")
         const idObjetoAMover = finalPriorityPID[0];
 
         // Filtrar el array para obtener el objeto que deseas mover
