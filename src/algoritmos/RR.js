@@ -23,6 +23,9 @@ export default function RR(quantum, arrayProcesos) {
     let reorder = false; // Por si hay que reordenar el array por llegada
     let changePriority = false; // Por si hay que mover un proceso al inicio del array
     let changePriorityPID = undefined; // PID del proceso a mover
+    let finalPriority = false; // Por si hay que mover un proceso al inicio del array
+    let finalPriorityPID = [];
+    let finalTick = 0;
     for (let i = 0; i < arrayProcesos.length; i++) {
 
       let proceso = arrayProcesos[i];
@@ -160,6 +163,14 @@ export default function RR(quantum, arrayProcesos) {
       }
       //(Caso 'Bloqueo')
       if (ultimoEstado === "Bloqueo") {
+        if (
+          proceso.contadoresBloqueos[proceso.counterNumBloqueo] ===
+          proceso.programa.bloqueos[proceso.counterNumBloqueo].duracion - 1
+        ) {
+          finalPriority = true;
+          finalPriorityPID.push(proceso.programa.pid);
+          finalTick = tick;
+        }
         //Revisar si contadoresBloqueos[proceso.counterNumBloqueos] es igual a la llegada del bloqueo en el programa
         //Para saber si terminó el bloqueo
         if (
@@ -169,7 +180,6 @@ export default function RR(quantum, arrayProcesos) {
           //De ser asi
           //Se incrementa proceso.counterNumBloqueos
           proceso.counterNumBloqueo++;
-
           //Se verifica si isProcesoEnEjecucion es true
           if (isProcesoEnEjecucion) {
             //De ser asi
@@ -260,20 +270,54 @@ export default function RR(quantum, arrayProcesos) {
       cpu_desaprovechada++;
     }
     //11. Si reorder es true, ordenar arrayProcesos por llegada
-    if (reorder) {
-      arrayProcesos = orderArrayProcesos(arrayProcesos);
-    }
+    // if (reorder) {
+    //   arrayProcesos = orderArrayProcesos(arrayProcesos);
+    // }
     //12. Si changePriority es true, mover el proceso con pid igual a changePriorityPID al inicio del arrayProcesos
-    if (changePriority) {
-      //buscar en arrayProcesos el proceso con pid igual a changePriorityPID y moverlo al inicio del array sin usar el array de procesos
-      arrayProcesos.unshift(
-        arrayProcesos.splice(
-          arrayProcesos.findIndex(
-            (proceso) => proceso.programa.pid === changePriorityPID
-          ),
-          1
-        )[0]
-      );
+    // if (changePriority) {
+    //   //buscar en arrayProcesos el proceso con pid igual a changePriorityPID y moverlo al inicio del array sin usar el array de procesos
+    //   arrayProcesos.unshift(
+    //     arrayProcesos.splice(
+    //       arrayProcesos.findIndex(
+    //         (proceso) => proceso.programa.pid === changePriorityPID
+    //       ),
+    //       1
+    //     )[0]
+    //   );
+    // }
+
+    if (finalPriority) {
+      console.log("Array en el tick " + tick + ":");
+      console.log(JSON.stringify(finalPriorityPID))
+      console.log(JSON.stringify(arrayProcesos));
+      // Obtener el índice del objeto después del cual deseas colocar el objeto a mover
+      const indiceAntesDe = arrayProcesos.findIndex(objeto => objeto.programa.llegada >= finalTick);
+      // Si se encontró el índice válido, insertar el objeto a mover después de ese índice
+      if (indiceAntesDe !== -1) {
+        console.log("entrar hasta que g se ejecute")
+        // Eliminar el objeto a mover del array original
+        const objetosAMover = arrayProcesos.filter(objeto => finalPriorityPID.includes(objeto.programa.pid));
+        arrayProcesos = arrayProcesos.filter(objeto => !finalPriorityPID.includes(objeto.programa.pid));
+
+        // Insertar el objeto a mover después del índice deseado
+        arrayProcesos.splice(indiceAntesDe - 1, 0, ...objetosAMover);
+      } else {
+        console.log("si g ya se ejecutó")
+        const idObjetoAMover = finalPriorityPID[0];
+
+        // Filtrar el array para obtener el objeto que deseas mover
+        const objetoAMover = arrayProcesos.find(objeto => objeto.programa.pid === idObjetoAMover);
+
+        // Filtrar el array para excluir el objeto que deseas mover
+        const arraySinObjetoAMover = arrayProcesos.filter(objeto => objeto.programa.pid !== idObjetoAMover);
+
+        // Concatenar el objeto movido al final del nuevo array
+        arrayProcesos = arraySinObjetoAMover.concat(objetoAMover);
+
+      }
+      console.log("Despues de... ");
+      console.log(JSON.stringify(arrayProcesos));
+
     }
     plan++;
     //13.Revisar si hay alguno de los procesos que no haya terminado, de ser asi se mantiene el booleano fin en false
@@ -296,6 +340,7 @@ export default function RR(quantum, arrayProcesos) {
     planificador_data
   };
 }
+
 
 function orderArrayProcesos(arrayProcesos) {
   return arrayProcesos.sort((a, b) => a.programa.llegada - b.programa.llegada);

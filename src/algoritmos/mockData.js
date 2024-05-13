@@ -193,7 +193,7 @@ export const programas = [
     bloqueos: [
       {
         llegada: 1,
-        duracion: 4,
+        duracion: 3,
       },
       {
         llegada: 2,
